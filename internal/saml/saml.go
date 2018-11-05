@@ -12,14 +12,8 @@ import (
 	"time"
 )
 
-// Interface for a saml service
-type Interface interface {
-	ProcessSAMLRequest(ctx context.Context, requestInput string) (*AuthnRequest, error)
-	GetSAMLResponse(ctx context.Context, userID, sessionID, email, audience string, hasAttributeStatement bool) (string, error)
-}
-
-// Service implements a SAML service
-type Service struct {
+// service implements a SAML service
+type service struct {
 	key                 *rsa.PrivateKey
 	cert                *x509.Certificate
 	SAMLIssuer          string
@@ -30,40 +24,47 @@ type Service struct {
 func New(keyPath, certPath, issuer, defaultAudience string) (Interface, error) {
 	pemData, err := ioutil.ReadFile(keyPath)
 	if err != nil {
+		fmt.Printf("%s\n", err.Error())
 		return nil, err
 	}
 
 	block, _ := pem.Decode(pemData)
 	key, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
+		fmt.Printf("%s\n", err.Error())
+
 		return nil, err
 	}
 
 	pemData, err = ioutil.ReadFile(certPath)
 	if err != nil {
+		fmt.Printf("%s\n", err.Error())
+
 		return nil, err
 	}
 
 	block, _ = pem.Decode(pemData)
 	cert, err := x509.ParseCertificate(block.Bytes)
 	if err != nil {
+		fmt.Printf("%s\n", err.Error())
+
 		return nil, err
 	}
 
-	return &Service{key: key, cert: cert, SAMLIssuer: issuer, DefaultSAMLAudience: defaultAudience}, nil
+	return &service{key: key, cert: cert, SAMLIssuer: issuer, DefaultSAMLAudience: defaultAudience}, nil
 }
 
 // GetSAMLResponse returns a SAML base64 encoded string
-func (s *Service) GetSAMLResponse(ctx context.Context, userID, sessionID, email, audience string, hasAttributeStatement bool) (string, error) {
+func (s service) GetSAMLResponse(ctx context.Context, userID, sessionID, email, audience, recipient, destination string, hasAttributeStatement bool) (string, error) {
 	err := validateParams(sessionID, email)
 	if err != nil {
 		return "", err
 	}
 
 	responseID := "response"
-	assertionID := "assertion"
+	assertionID := fmt.Sprintf("assertion-%s", randomString(20))
 	now := time.Now().Round(time.Second).UTC()
-	until := now.Add(time.Hour * 24).Round(time.Second).UTC()
+	until := now.Add(60 * time.Minute).Round(time.Second).UTC()
 
 	if audience == "" {
 		audience = s.DefaultSAMLAudience
@@ -73,7 +74,7 @@ func (s *Service) GetSAMLResponse(ctx context.Context, userID, sessionID, email,
 	resp := Response{
 		Version:      "2.0",
 		IssueInstant: now,
-		Destination:  audience,
+		Destination:  destination,
 		ID:           responseID,
 		Assertion: Assertion{
 			ID:           assertionID,
@@ -83,7 +84,7 @@ func (s *Service) GetSAMLResponse(ctx context.Context, userID, sessionID, email,
 				AudienceRestriction: AudienceRestriction{
 					Audience: audience,
 				},
-				NotBefore:    now.Add(-3 * time.Minute).UTC(),
+				NotBefore:    now,
 				NotOnOrAfter: until,
 			},
 			Issuer: s.SAMLIssuer,
@@ -103,7 +104,7 @@ func (s *Service) GetSAMLResponse(ctx context.Context, userID, sessionID, email,
 				Confirmation: SubjectConfirmation{
 					Method: TokenTypeBearer,
 					Data: SubjectConfirmationData{
-						Recipient:    audience,
+						Recipient:    recipient,
 						NotOnOrAfter: until,
 					},
 				},
@@ -145,7 +146,7 @@ func validateParams(sessionID, email string) error {
 }
 
 // ProcessSAMLRequest returns a AuthnRequest object from the SAML request string
-func (s *Service) ProcessSAMLRequest(ctx context.Context, requestInput string) (*AuthnRequest, error) {
+func (s service) ProcessSAMLRequest(ctx context.Context, requestInput string) (*AuthnRequest, error) {
 	if requestInput == "" {
 		return nil, fmt.Errorf("requestInput cannot be empty")
 	}

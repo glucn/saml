@@ -30,7 +30,7 @@ type AuthnRequest struct {
 	Signature Signature `xml:"http://www.w3.org/2000/09/xmldsig# Signature"`
 }
 
-func processRequest(ctx context.Context, requestString string) (*AuthnRequest, error) {
+func processRequest(_ctx context.Context, requestString string) (*AuthnRequest, error) {
 	// decode from base64
 	compressedRequest, err := base64.StdEncoding.DecodeString(requestString)
 	if err != nil {

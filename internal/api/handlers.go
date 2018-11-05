@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	ssoLogin = "https://www.google.com/a/socialconnections.com/acs"
+	ssoLogin = "https://idfed.s1.constantcontact.com/sp/ACS.saml2"
 )
 
 // HTTPServer is the http server implementation
@@ -87,12 +87,28 @@ func (h *HTTPServer) buildSAMLPage(ctx context.Context, w http.ResponseWriter, s
 	fmt.Printf("Session: %+v\n", session)
 
 	if session == nil {
-		samlResp, err = h.saml.GetSAMLResponse(ctx, "userID", "sessionID", "a@b.com", "", false)
+		samlResp, err = h.saml.GetSAMLResponse(
+			ctx,
+			"userID",
+			"sessionID",
+			"AG-LZ2VKCPFWC",
+			"s1.vendasta.constantcontact.com",
+			"https://idfed.s1.constantcontact.com/sp/ACS.saml2",
+			"https://idfed.s1.constantcontact.com/sp/ACS.saml2",
+			false)
 	} else {
 		fmt.Printf("UserID: %s\n", session.User.UserID)
 		fmt.Printf("SessionID: %s\n", session.SessionID)
 		fmt.Printf("Email: %s\n", session.User.Email)
-		samlResp, err = h.saml.GetSAMLResponse(ctx, session.User.UserID, session.SessionID, session.User.Email, "", false)
+		samlResp, err = h.saml.GetSAMLResponse(
+			ctx,
+			"userID",
+			"sessionID",
+			"AG-LZ2VKCPFWC",
+			"s1.vendasta.constantcontact.com",
+			"https://idfed.s1.constantcontact.com/sp/ACS.saml2",
+			"https://idfed.s1.constantcontact.com/sp/ACS.saml2",
+			false)
 	}
 
 	if err != nil {
@@ -100,7 +116,7 @@ func (h *HTTPServer) buildSAMLPage(ctx context.Context, w http.ResponseWriter, s
 		return fmt.Errorf("internal error")
 	}
 	fmt.Fprintf(w, samlPage, ssoLogin, samlResp,
-		"https://apps.google.com/user/hub")
+		"https://idfed.s1.constantcontact.com/sp/ACS.saml2")
 	return nil
 }
 
