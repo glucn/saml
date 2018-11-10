@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	ssoLogin = "https://idfed.s1.constantcontact.com/sp/ACS.saml2"
+	ssoLogin = "https://idfed.constantcontact.com/sp/ACS.saml2"
 )
 
 // HTTPServer is the http server implementation
@@ -91,10 +91,10 @@ func (h *HTTPServer) buildSAMLPage(ctx context.Context, w http.ResponseWriter, s
 			ctx,
 			"userID",
 			"sessionID",
-			"AG-LZ2VKCPFWC",
-			"s1.vendasta.constantcontact.com",
-			"https://idfed.s1.constantcontact.com/sp/ACS.saml2",
-			"https://idfed.s1.constantcontact.com/sp/ACS.saml2",
+			"AG-TESTSSO03",
+			"vendasta.constantcontact.com",
+			"https://idfed.constantcontact.com/sp/ACS.saml2",
+			"https://idfed.constantcontact.com/sp/ACS.saml2",
 			false)
 	} else {
 		fmt.Printf("UserID: %s\n", session.User.UserID)
@@ -104,10 +104,10 @@ func (h *HTTPServer) buildSAMLPage(ctx context.Context, w http.ResponseWriter, s
 			ctx,
 			"userID",
 			"sessionID",
-			"AG-LZ2VKCPFWC",
-			"s1.vendasta.constantcontact.com",
-			"https://idfed.s1.constantcontact.com/sp/ACS.saml2",
-			"https://idfed.s1.constantcontact.com/sp/ACS.saml2",
+			"AG-TESTSSO03",
+			"vendasta.constantcontact.com",
+			"https://idfed.constantcontact.com/sp/ACS.saml2",
+			"https://idfed.constantcontact.com/sp/ACS.saml2",
 			false)
 	}
 
@@ -115,8 +115,8 @@ func (h *HTTPServer) buildSAMLPage(ctx context.Context, w http.ResponseWriter, s
 		fmt.Printf("Error in GetSAMLResponse: %s", err.Error())
 		return fmt.Errorf("internal error")
 	}
-	fmt.Fprintf(w, samlPage, ssoLogin, samlResp,
-		"https://idfed.s1.constantcontact.com/sp/ACS.saml2")
+	fmt.Println(samlResp)
+	fmt.Fprintf(w, samlPage, ssoLogin, samlResp)
 	return nil
 }
 
@@ -134,7 +134,6 @@ var samlPage = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "
     <form method="post" action="%s">
         <input type="submit" style="display:none;" />
         <input type="hidden" name="SAMLResponse" value="%s" />
-		<input type="hidden" name="RelayState" value="%s" />
         <noscript>
             <input type="submit" value="Submit" />
         </noscript>
