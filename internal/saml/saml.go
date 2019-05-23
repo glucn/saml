@@ -44,11 +44,14 @@ func New(keyPath, certPath, issuer, defaultAudience string) (Interface, error) {
 		return nil, err
 	}
 
+	fmt.Printf("3")
 	block, _ = pem.Decode(pemData)
 	cert, err := x509.ParseCertificate(block.Bytes)
 	if err != nil {
+		fmt.Printf(err.Error())
 		return nil, err
 	}
+	fmt.Printf("5")
 
 	return &Service{key: key, cert: cert, SAMLIssuer: issuer, DefaultSAMLAudience: defaultAudience}, nil
 }
@@ -62,8 +65,8 @@ func (s *Service) GetSAMLResponse(ctx context.Context, userID, sessionID, email,
 
 	responseID := "response"
 	assertionID := "assertion"
-	now := time.Now().Round(time.Second).UTC()
-	until := now.Add(time.Hour * 24).Round(time.Second).UTC()
+	now := time.Now().Add(-(time.Hour * 2)).Round(time.Second).UTC()
+	until := now.Add(time.Hour * 2).Round(time.Second).UTC()
 
 	if audience == "" {
 		audience = s.DefaultSAMLAudience
@@ -83,7 +86,7 @@ func (s *Service) GetSAMLResponse(ctx context.Context, userID, sessionID, email,
 				AudienceRestriction: AudienceRestriction{
 					Audience: audience,
 				},
-				NotBefore:    now.Add(-3 * time.Minute).UTC(),
+				NotBefore:    now.Add(-3 * time.Hour).UTC(),
 				NotOnOrAfter: until,
 			},
 			Issuer: s.SAMLIssuer,
@@ -91,14 +94,14 @@ func (s *Service) GetSAMLResponse(ctx context.Context, userID, sessionID, email,
 				AuthnInstant:        now,
 				SessionIndex:        sessionID,
 				SessionNotOnOrAfter: until,
-				AuthnContext: AuthnContext{
-					AuthnContextClassRef: AunthContextPasswordProtectedTransport,
-				},
+				//AuthnContext: AuthnContext{
+				//AuthnContextClassRef: AunthContextPasswordProtectedTransport,
+				//},
 			},
 			Subject: Subject{
 				NameID: NameID{
 					Format: NameFormatUnspecified,
-					ID:     email,
+					ID:     "ABCDEFG1234567890",
 				},
 				Confirmation: SubjectConfirmation{
 					Method: TokenTypeBearer,
@@ -114,6 +117,24 @@ func (s *Service) GetSAMLResponse(ctx context.Context, userID, sessionID, email,
 			Issuer: s.SAMLIssuer,
 		},
 	}
+
+	if resp.Assertion.AttributeStatement == nil {
+		resp.Assertion.AttributeStatement = &AttributeStatement{}
+	}
+	resp.Assertion.AttributeStatement.Attributes = append(
+		resp.Assertion.AttributeStatement.Attributes,
+		Attribute{
+			Name:       "IDPEmail",
+			NameFormat: NameFormatBasic,
+			Values: []AttributeValue{
+				AttributeValue{
+					Type:  XMLString,
+					XMLNS: "http://www.w3.org/2001/XMLSchema",
+					Value: "chickson@chickn.club",
+				},
+			},
+		})
+
 	resp.SetSuccess()
 
 	if hasAttributeStatement {

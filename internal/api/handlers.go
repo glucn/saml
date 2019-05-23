@@ -3,14 +3,13 @@ package api
 import (
 	"context"
 	"fmt"
+	"github.com/vendasta/saml/internal/saml"
+	"github.com/vendasta/saml/internal/session/repository"
 	"net/http"
-
-	"github.com/glucn/saml/internal/saml"
-	"github.com/glucn/saml/internal/session/repository"
 )
 
 const (
-	ssoLogin = "https://www.google.com/a/socialconnections.com/acs"
+	ssoLogin = "https://login.microsoftonline.com/login.srf"
 )
 
 // HTTPServer is the http server implementation
@@ -70,8 +69,8 @@ func (h *HTTPServer) Entry(w http.ResponseWriter, r *http.Request) {
 	var session *sessionrepository.Session
 	session = &sessionrepository.Session{
 		User: &sessionrepository.User{
-			Email:  "developers@socialconnections.com",
-			UserID: "developers",
+			Email:  "luckycharms@vendasta.com",
+			UserID: "luckycharms",
 		},
 		SessionID: "sessionID",
 	}
