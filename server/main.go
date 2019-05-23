@@ -2,17 +2,33 @@ package main
 
 import (
 	"fmt"
-	"github.com/glucn/saml/internal/api"
-	"github.com/glucn/saml/internal/saml"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/glucn/saml/internal/api"
+	"github.com/vendasta/saml"
 )
 
 func main() {
 	var err error
 
-	samlService, err := saml.New("keys/test2/rsaprivkey.pem", "keys/test2/rsacert.pem",
+	keyPath := "keys/test2/rsaprivkey.pem"
+	key, err := ioutil.ReadFile(keyPath)
+	if err != nil {
+		fmt.Printf("%s\n", err.Error())
+		panic(err.Error())
+	}
+
+	certPath := "keys/test2/rsacert.pem"
+	cert, err := ioutil.ReadFile(certPath)
+	if err != nil {
+		fmt.Printf("%s\n", err.Error())
+		panic(err.Error())
+	}
+
+	samlService, err := saml.New(key, cert,
 		"https://www.google.com/a/socialconnections.com/acs", "https://www.google.com/a/socialconnections.com/acs")
 	if err != nil {
 		fmt.Printf("Error starting saml service\n")

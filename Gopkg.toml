@@ -24,3 +24,7 @@
   non-go = true
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+  name = "github.com/vendasta/saml"
+  branch = "lc/change-for-ctct"

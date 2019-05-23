@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/glucn/saml/internal/saml"
 	"github.com/glucn/saml/internal/session/repository"
+	"github.com/vendasta/saml"
 )
 
 const (
@@ -45,7 +45,7 @@ func (h *HTTPServer) SignIn(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("mothod not implemented")
 		break
 	default:
-		fmt.Errorf("method not allowed")
+		fmt.Printf("method not allowed")
 		return
 	}
 	fmt.Fprintf(w, "<h1>Sign In</h1><div>authnRequest: %v</div><div>relayState: %s</div>", *authnRequest, relayState)
@@ -86,20 +86,30 @@ func (h *HTTPServer) buildSAMLPage(ctx context.Context, w http.ResponseWriter, s
 
 	fmt.Printf("Session: %+v\n", session)
 
-	if session == nil {
-		samlResp, err = h.saml.GetSAMLResponse(ctx, "userID", "sessionID", "a@b.com", "", false)
-	} else {
-		fmt.Printf("UserID: %s\n", session.User.UserID)
-		fmt.Printf("SessionID: %s\n", session.SessionID)
-		fmt.Printf("Email: %s\n", session.User.Email)
-		samlResp, err = h.saml.GetSAMLResponse(ctx, session.User.UserID, session.SessionID, session.User.Email, "", false)
+	audience := "https://www.google.com/a/goog-test.demosso.com.reseller.vendasta.com/acs"
+
+	samlSess := saml.Session{
+		UserEmail: "admin@goog-test.demosso.com.reseller.vendasta.com",
+		Index:     "randomsessionid",
+		NameID:    "admin@goog-test.demosso.com.reseller.vendasta.com",
 	}
+
+	//if session == nil {
+	samlResp, err = h.saml.GetSAMLResponse(ctx, audience, audience, audience, samlSess, false)
+	//} else {
+	//	fmt.Printf("UserID: %s\n", session.User.UserID)
+	//	fmt.Printf("SessionID: %s\n", session.SessionID)
+	//	fmt.Printf("Email: %s\n", session.User.Email)
+	//	samlResp, err = h.saml.GetSAMLResponse(ctx, session.User.UserID, session.SessionID, session.User.Email, audience, audience, audience, false)
+	//}
 
 	if err != nil {
 		fmt.Printf("Error in GetSAMLResponse: %s", err.Error())
 		return fmt.Errorf("internal error")
 	}
-	fmt.Fprintf(w, samlPage, ssoLogin, samlResp,
+
+	fmt.Println(samlResp)
+	fmt.Fprintf(w, samlPage, audience, samlResp,
 		"https://apps.google.com/user/hub")
 	return nil
 }

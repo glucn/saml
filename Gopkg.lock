@@ -3,13 +3,61 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:c8bf738c94f86fb046b1d36469d631099d37e16bda880ede4a79c407cec74a66"
   name = "fknsrs.biz/p/xml"
   packages = ["c14n"]
+  pruneopts = "NUT"
   revision = "75d8d9641d0d0b737fecdcc42ae43f5746e9978d"
+
+[[projects]]
+  digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  pruneopts = "NUT"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
+
+[[projects]]
+  digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
+  name = "github.com/pmezard/go-difflib"
+  packages = ["difflib"]
+  pruneopts = "NUT"
+  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:60a46e2410edbf02b419f833372dd1d24d7aa1b916a990a7370e792fada1eadd"
+  name = "github.com/stretchr/objx"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "477a77ecc69700c7cdeb1fa9e129548e1c1c393c"
+  version = "v0.1.1"
+
+[[projects]]
+  digest = "1:81d363777b015e85bd42b978b80f4f5ecdaa43e11452ba8ff7ea93db3ce166bd"
+  name = "github.com/stretchr/testify"
+  packages = [
+    "assert",
+    "mock",
+  ]
+  pruneopts = "NUT"
+  revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
+  version = "v1.2.2"
+
+[[projects]]
+  branch = "lc/change-for-ctct"
+  digest = "1:ce5a1554e4bed43ff95996d8cfef6435dee507a08a249552f86b350c2ba4d465"
+  name = "github.com/vendasta/saml"
+  packages = ["."]
+  pruneopts = "NUT"
+  revision = "7a286f2635c9e905b3ff9efc6f930c613a5bc9ae"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4e0dae68ba4e2939c1dbab3ff8925c29fc0b3f48329af84102748ea4e6351996"
+  input-imports = [
+    "fknsrs.biz/p/xml/c14n",
+    "github.com/vendasta/saml",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
