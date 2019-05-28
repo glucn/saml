@@ -126,8 +126,9 @@ type AuthnStatement struct {
 type AttributeValue struct {
 	XMLName xml.Name `xml:"urn:oasis:names:tc:SAML:2.0:assertion AttributeValue"`
 	XMLNS   string   `xml:"xmlns:xs,attr"`
-	Type    string   `xml:"http://www.w3.org/2001/XMLSchema-instance type,attr"`
-	Value   string   `xml:",chardata"`
+	//TODO: note that having a value set for Type breaks MS SSO
+	Type  string `xml:"http://www.w3.org/2001/XMLSchema-instance type,attr,omitempty"`
+	Value string `xml:",chardata"`
 }
 
 // Attribute is an attribute

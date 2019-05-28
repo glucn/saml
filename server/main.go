@@ -12,8 +12,8 @@ import (
 func main() {
 	var err error
 
-	samlService, err := saml.New("keys/rsaprivkey.pem", "keys/rsacert.pem",
-		"https://ExampleIdentityProvider", "urn:federation:MicrosoftOnline")
+	samlService, err := saml.New("keys/rsaprivkey.pem", "keys/rsacert2.pem",
+		"https://chickn.club/SAML", "urn:federation:MicrosoftOnline")
 	if err != nil {
 		fmt.Printf("Error starting saml service\n")
 		os.Exit(-1)

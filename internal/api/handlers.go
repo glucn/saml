@@ -69,8 +69,8 @@ func (h *HTTPServer) Entry(w http.ResponseWriter, r *http.Request) {
 	var session *sessionrepository.Session
 	session = &sessionrepository.Session{
 		User: &sessionrepository.User{
-			Email:  "luckycharms@vendasta.com",
-			UserID: "luckycharms",
+			Email:  "chickson@chickn.club",
+			UserID: "ABCDEFG1234567890",
 		},
 		SessionID: "sessionID",
 	}
@@ -86,12 +86,12 @@ func (h *HTTPServer) buildSAMLPage(ctx context.Context, w http.ResponseWriter, s
 	fmt.Printf("Session: %+v\n", session)
 
 	if session == nil {
-		samlResp, err = h.saml.GetSAMLResponse(ctx, "userID", "sessionID", "a@b.com", "", false)
+		samlResp, err = h.saml.GetSAMLResponse(ctx, "userID", "sessionID", "chickson@chickn.club", "", false)
 	} else {
 		fmt.Printf("UserID: %s\n", session.User.UserID)
 		fmt.Printf("SessionID: %s\n", session.SessionID)
 		fmt.Printf("Email: %s\n", session.User.Email)
-		samlResp, err = h.saml.GetSAMLResponse(ctx, session.User.UserID, session.SessionID, session.User.Email, "", false)
+		samlResp, err = h.saml.GetSAMLResponse(ctx, session.User.UserID, session.SessionID, session.User.Email, "urn:federation:MicrosoftOnline", false)
 	}
 
 	if err != nil {
@@ -99,7 +99,7 @@ func (h *HTTPServer) buildSAMLPage(ctx context.Context, w http.ResponseWriter, s
 		return fmt.Errorf("internal error")
 	}
 	fmt.Fprintf(w, samlPage, ssoLogin, samlResp,
-		"https://apps.google.com/user/hub")
+		"https://login.microsoftonline.com/login.srf")
 	return nil
 }
 
